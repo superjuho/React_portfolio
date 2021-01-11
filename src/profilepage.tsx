@@ -1,8 +1,8 @@
 import * as React from "react"
 import { Link } from 'react-router-dom'
-import {useEffect, useState} from "react"
-import "./styles.css"
+import {useEffect, useState, useCallback, useLayoutEffect} from "react"
 import { gsap } from "gsap"
+import "./styles.css"
 import TextPlugin from 'gsap/TextPlugin'
 import Tooltip from '@material-ui/core/Tooltip'
 import { makeStyles } from '@material-ui/core/styles'
@@ -28,9 +28,10 @@ import AdobePremiereLogo from "./static/AdobePremiereLogo.png"
 import AdobeXDLogo from "./static/AdobeXDLogo.png"
 import AfterEffectsLogo from "./static/AfterEffectsLogo.png"
 import PhotoshopLogo from "./static/PhotoshopLogo.png"
-import marvin from "./static/photos/Marvin_martian_vector.png"
-import aiDownload from "./static/ai_download.png"
-import ReactModal from 'react-modal-resizable-draggable'
+import { isBrowser, isMobile } from 'react-device-detect'
+/* import marvin from "./static/photos/Marvin_martian_vector.png"
+import aiDownload from "./static/ai_download.png" */
+
 
 
 gsap.registerPlugin(TextPlugin)
@@ -197,10 +198,12 @@ const popUp =() => {
   
   } else if (viewSize.matches && !PopUpShown) {
     const popupText = document.querySelector(".popuptext")
-    if(popupText)
-    {popupText.innerHTML = "Here are some of languages and programs I use and know, since you are on mobile. You wont get full experience. First click on code or CC to see all and by holding on a logo you get more information."}
-    
-    
+    if(popupText && isMobile) {
+      popupText.innerHTML = `Here are some of languages and programs I use and know, since you are on mobile. 
+    You wont get full experience. First click on code or CC to see all and by holding on a logo you get more information.`
+    } else if (popupText && !isMobile) {
+      popupText.innerHTML = `Here are some of languages and programs I use and know.`
+    }
     const popup = document.getElementById("PopupDesc");
     if(popup) {
       popup.classList.toggle("show");
@@ -262,27 +265,45 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+
+  
+
+ /* return (
+      <>
+                <img className="adobelogo" src={IllustratorLogo} alt="IlluLogo" onClick={onOk}/>
+          <DraggableModal visible={visible} onOk={onOk} onCancel={onCancel}>
+          <div className="modalHeader">
+                      <p className="headText">Drawn with mouse using Adobe Illustrator</p>
+                        <p className="modalClose">X</p>
+                    </div>
+                    <div className="modalBody">
+                        <img className="marvin" src={marvin}/>
+                        <div className="modalFooter">
+                          <p>Download ai.file press 🠞</p>
+                          <a href="http://users.metropolia.fi/~juhopuur/jQuerystuff/Portfolio/images/Marvin_martian.ai">
+                            <img src={aiDownload} className="aiDownload"/>
+                            </a>
+                        </div>
+                    </div>
+          </DraggableModal>
+      </>
+  )
+} */
+
+
 const ProfilePage = () => {
 
-  const [modal, setModal] = useState({modalIsOpen: false});
-
-  const openModal = () => {
-    setModal({modalIsOpen: true})
-  }
-
-  const closeModal = () => {
-    setModal({modalIsOpen: false})
-  }
-
   let classes = useStyles();
-
+  
   useEffect (() =>{
     window.oncontextmenu = function(event: MouseEvent) {
       event.preventDefault();
       event.stopPropagation();
       return false;
     };
-
+    window.addEventListener('resize', function() {
+      window.location.reload();
+    });
     profile()
     popUp()
   },[])
@@ -303,30 +324,13 @@ const ProfilePage = () => {
       
       <br/>
     </div>
-    <ReactModal initWidth={400} initHeight={450} 
-                onFocus={() => console.log("Modal is clicked")}
-                className={"Modal"}
-                onRequestClose={() => closeModal()} 
-                isOpen={modal.modalIsOpen}>
-                    <div className="modalHeader">
-                      <p className="headText">Drawn with mouse using Adobe Illustrator</p>
-                        <p className="modalClose" onClick={()=>closeModal()}>X</p>
-                    </div>
-                    <div className="modalBody">
-                        <img className="marvin" src={marvin}/>
-                        <div className="modalFooter">
-                          <p>Download ai.file press 🠞</p>
-                          <a href="http://users.metropolia.fi/~juhopuur/jQuerystuff/Portfolio/images/Marvin_martian.ai">
-                            <img src={aiDownload} className="aiDownload"/>
-                            </a>
-                          
-                        </div>
-                    </div>
-                </ReactModal>
         <div className="sideDiv">
           <h3 className="about" onMouseEnter={() => aboutDropDown()} onMouseLeave={() => aboutDropUp()}>About</h3>
           <div className="aboutDrop">
-            <a className="text">Curriculum Vitae</a>
+            {!isMobile && isBrowser ?
+            <Link to="/cv" className="text">Curriculum Vitae</Link>
+          : <a href="./static/JuhoPuurunen_Resume2020.pdf" download>Curriculum Vitae</a>  
+          }
             <p className="text">juho.puurune@gmail.com</p>
             <p className="text">juho.puurunen@metropolia.fi</p>
             <p className="text">0400 771526</p>
@@ -398,9 +402,13 @@ const ProfilePage = () => {
                 <img className="adobelogo" src={PhotoshopLogo} alt="PhotoshopLogo"/>
               </Tooltip>
            </Link>
-              <Tooltip title="I like to use Illustration for logos, here's just one sketch tho" placement="top" arrow classes={{ arrow: classes.arrow, tooltip: classes.tooltip}}>
-                <img className="adobelogo" src={IllustratorLogo} alt="IlluLogo"  onClick={() => openModal()}/>
+           
+         
+             <Tooltip title="I like to use Illustration for logos, here's just one sketch tho" placement="top" arrow classes={{ arrow: classes.arrow, tooltip: classes.tooltip}}>
+             <img className="adobelogo" src={IllustratorLogo} alt="IlluLogo" />
               </Tooltip>
+            
+
             <a href="https://xd.adobe.com/view/d624d181-2010-48ce-9807-75b3863473a3-8377/?fullscreen" className="adobeLink">
               <Tooltip title="Adobe XD is great for UX design, from here you can see my latest mockup for a client" placement="top" arrow classes={{ arrow: classes.arrow, tooltip: classes.tooltip}}>
                 <img className="adobelogo" src={AdobeXDLogo} alt="XDLogo"/>

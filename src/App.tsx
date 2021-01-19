@@ -1,6 +1,6 @@
 import React from "react";
 import ProfilePage from './profilepage'
-import {BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import "./App.css"
 import ValhallaDenied from "./valhalladenied"
 import PhotoPage from "./photography"

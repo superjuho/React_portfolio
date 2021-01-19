@@ -96,7 +96,7 @@ const codesShow = () => { // this shows the code and engine logos
     const aboutElement = document.querySelector(".sideDiv") 
     tl.to([profileElement, aboutElement], 1, {opacity: 0})
     tl.to([adobes], .5, {left: "200px"})
-    tl.to([codes], 1, {height: "70vh", width: "140px"})
+    tl.to([codes], 1, {height: "70vh", width: "140px",})
   } else if (!CodeShown && window.innerWidth < 421) {
     CodeShown = true
     const codes = document.querySelector(".codes")
